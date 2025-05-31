@@ -9,6 +9,7 @@ export type Resource =
   | 'team_sso'
   | 'team_dsync'
   | 'team_audit_log'
+  | 'okr'
   | 'team_webhook'
   | 'team_payments'
   | 'team_api_key';
@@ -64,6 +65,10 @@ export const permissions: RolePermissions = {
       actions: '*',
     },
     {
+      resource: 'okr',
+      actions: '*',
+    },
+    {
       resource: 'team_payments',
       actions: '*',
     },
@@ -99,6 +104,10 @@ export const permissions: RolePermissions = {
     },
     {
       resource: 'team_audit_log',
+      actions: '*',
+    },
+      {
+      resource: 'okr',
       actions: '*',
     },
     {

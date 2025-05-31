@@ -67,6 +67,8 @@ model User {
   accounts    Account[]
   sessions    Session[]
   invitations Invitation[]
+
+  Objective Objective[]
 }
 
 model Team {
@@ -84,6 +86,8 @@ model Team {
   apiKeys         ApiKey[]
 
   @@index([billingId])
+  Initiative Initiative[]
+  Objective Objective[]
 }
 
 model TeamMember {
@@ -217,4 +221,113 @@ model jackson_ttl {
 
   @@index([expiresAt], map: "_jackson_ttl_expires_at")
   @@ignore
+}
+
+enum ObjectiveStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum KeyResultStatus {
+  IN_PROGRESS
+  ACHIEVED
+  BLOCKED
+  DROPPED
+}
+
+enum InitiativeStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+model Objective {
+  id          String      @id @default(uuid())
+  teamId      String
+  title       String
+  description String?
+  ownerId     String?
+  status      ObjectiveStatus @default(ACTIVE)
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+
+  team    Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  owner   User?  @relation(fields: [ownerId], references: [id])
+  keyResults     KeyResult[]
+  initiatives    Initiative[]
+
+  @@index([teamId])
+  @@index([ownerId])
+}
+
+model KeyResult {
+  id           String    @id @default(uuid())
+  objectiveId  String
+  title        String
+  targetValue  Float
+  currentValue Float     @default(0)
+  unit         String?   // e.g., %, $, Users
+  status       KeyResultStatus @default(IN_PROGRESS)
+  source       String?   // manual, Jira, etc.
+  lastSyncedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  objective Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  jiraLinks JiraIssueLink[]
+  snapshots ProgressSnapshot[]
+
+  @@index([objectiveId])
+  Initiative Initiative[]
+}
+
+model Initiative {
+  id          String    @id @default(uuid())
+  teamId      String
+  title       String
+  description String?
+  objectiveId String?
+  status      InitiativeStatus @default(PLANNED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  objective  Objective? @relation(fields: [objectiveId], references: [id])
+  keyResults KeyResult[]
+  jiraLinks  JiraIssueLink[]
+
+  @@index([teamId])
+  @@index([objectiveId])
+}
+
+model JiraIssueLink {
+  id           String   @id @default(uuid())
+  keyResultId  String?
+  initiativeId String?
+  jiraIssueKey String   // e.g., PROJ-123
+  jiraUrl      String
+  syncedAt     DateTime
+
+  keyResult  KeyResult?   @relation(fields: [keyResultId], references: [id], onDelete: Cascade)
+  initiative Initiative?  @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+
+  @@index([jiraIssueKey])
+  @@index([keyResultId])
+  @@index([initiativeId])
+}
+
+model ProgressSnapshot {
+  id           String   @id @default(uuid())
+  keyResultId  String
+  value        Float
+  createdAt    DateTime @default(now())
+
+  keyResult KeyResult @relation(fields: [keyResultId], references: [id], onDelete: Cascade)
+
+  @@index([keyResultId])
 }
