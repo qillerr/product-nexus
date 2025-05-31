@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ObjectiveStatus } from '@prisma/client';
 import { throwIfNoTeamAccess } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
-import { updateObjective, deleteObjective } from 'models/objective';
+import { updateObjective, deleteObjective, getObjectiveById } from 'models/objective';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method, query, body } = req;
@@ -12,6 +12,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const teamMember = await throwIfNoTeamAccess(req, res);
 
     switch (method) {
+      case 'GET': {
+        throwIfNotAllowed(teamMember, 'okr', 'read');
+        const objective = await getObjectiveById(objectiveId as string, teamMember.team.id);
+        if (!objective) {
+          return res.status(404).json({ error: { message: 'Objective not found' } });
+        }
+        res.status(200).json({ data: objective });
+        break;
+      }
       case 'PUT': {
         throwIfNotAllowed(teamMember, 'okr', 'update');
         const { title, description, status, startDate, endDate, keyResults } = body;
@@ -40,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break;
       }
       default:
-        res.setHeader('Allow', 'PUT, DELETE');
+        res.setHeader('Allow', 'GET, PUT, DELETE');
         res.status(405).json({ error: { message: `Method ${method} Not Allowed` } });
     }
   } catch (error: any) {

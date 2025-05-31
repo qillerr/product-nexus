@@ -89,3 +89,13 @@ export const updateObjective = async (
     },
   });
 };
+
+export const getObjectiveById = async (id: string, teamId: string) => {
+  return prisma.objective.findFirst({
+    where: { id, teamId },
+    include: {
+      keyResults: true,
+      initiatives: true,
+    },
+  });
+};

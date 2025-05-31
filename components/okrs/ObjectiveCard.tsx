@@ -9,6 +9,7 @@ interface ObjectiveCardProps {
   handleDelete: (id: string) => void;
   t: (key: string) => string;
   onEdit?: (objective: Objective) => void;
+  onDetails?: (objective: Objective) => void;
 }
 
 const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
@@ -19,6 +20,7 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
   handleDelete,
   t,
   onEdit,
+  onDetails,
 }) => (
   <div className="mb-8 border rounded p-4 shadow relative">
     {/* Dropdown button in top-right */}
@@ -33,7 +35,14 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
         <span style={{ fontSize: 20 }}>⋯</span>
       </button>
       {dropdownOpenId === objective.id && (
-        <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-20">
+        <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-20">
+          <button
+            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+            onClick={() => onDetails && onDetails(objective)}
+            disabled={!!deletingId}
+          >
+            {t('Details')}
+          </button>
           <button
             className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-gray-100"
             onClick={() => onEdit && onEdit(objective)}

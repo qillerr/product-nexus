@@ -10,10 +10,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Objective, KeyResult, Initiative } from '@/types/okr';
 import { useOkrs } from '../../../hooks/useOkrs';
 import Toast from '@/components/shared/Toast';
+import { useRouter } from 'next/router';
 
 const Okrs = () => {
   const { t } = useTranslation('common');
   const { team, isLoading: teamLoading, isError: teamError } = useTeam();
+  const router = useRouter();
   // Modal
   const [showModal, setShowModal] = useState(false);
   // Form
@@ -197,6 +199,7 @@ const Okrs = () => {
           handleDelete={handleDelete}
           t={t}
           onEdit={openEditModal}
+          onDetails={obj => router.push(`/teams/${team?.slug}/okrs/${obj.id}`)}
         />
       ))}
       {/* Pagination controls */}
