@@ -32,14 +32,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
   throwIfNotAllowed(teamMember, 'okr', 'read');
-  const objectives = await getObjectivesByTeam(teamMember.team.id);
-  res.status(200).json({ data: objectives });
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const skip = (page - 1) * limit;
+  const [objectives, total] = await Promise.all([
+    getObjectivesByTeam(teamMember.team.id, { skip, take: limit }),
+    getObjectivesByTeam(teamMember.team.id, { countOnly: true }),
+  ]);
+  res.status(200).json({ data: objectives, total });
 };
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
   throwIfNotAllowed(teamMember, 'okr', 'create');
-  const { title, description, status, startDate, endDate } = req.body;
+  const { title, description, status, startDate, endDate, keyResults } = req.body;
   if (!title || !startDate || !endDate) {
     return res.status(400).json({ error: { message: 'Missing required fields' } });
   }
@@ -50,6 +56,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     status: status || ObjectiveStatus.ACTIVE,
     startDate: new Date(startDate),
     endDate: new Date(endDate),
+    keyResults: keyResults || [],
   });
   res.status(201).json({ data: objective });
 };

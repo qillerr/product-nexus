@@ -1,19 +1,19 @@
 import { Loading, Error } from '@/components/shared';
 import ObjectiveModal from '@/components/okrs/ObjectiveModal';
 import ObjectiveCard from '@/components/okrs/ObjectiveCard';
+import KeyResultsInput, { KeyResultDraft } from '@/components/okrs/KeyResultsInput';
 import useTeam from 'hooks/useTeam';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import useSWR, { mutate } from 'swr';
 import { useEffect, useRef, useState } from 'react';
 import { Objective, KeyResult, Initiative } from '@/types/okr';
-
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+import { useOkrs } from '../../../hooks/useOkrs';
+import Toast from '@/components/shared/Toast';
 
 const Okrs = () => {
   const { t } = useTranslation('common');
-  const { team, isLoading, isError } = useTeam();
+  const { team, isLoading: teamLoading, isError: teamError } = useTeam();
   // Modal
   const [showModal, setShowModal] = useState(false);
   // Form
@@ -31,16 +31,28 @@ const Okrs = () => {
   const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
   // Auto-validation in modal
   const [modal_touched, setModalTouched] = useState<{ [key: string]: boolean }>({});
+  // Key Results state for modal
+  const [keyResults, setKeyResults] = useState<KeyResultDraft[]>([]);
+  const [toastMsg, setToastMsg] = useState('');
 
-  const { data, error } = useSWR<{ data: Objective[] }>(
-    team ? `/api/teams/${team.slug}/okrs` : null,
-    fetcher
-  );
+  // Pagination and OKR data logic
+  const {
+    objectives,
+    total,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    pageSize,
+    createOrUpdateObjective,
+    deleteObjective,
+  } = useOkrs(team?.slug, 10);
 
-  if (isLoading) return <Loading />;
-  if (isError) return <Error message={isError.message} />;
+  if (teamLoading) return <Loading />;
+  if (teamError) return <Error message={teamError.message} />;
   if (!team) return <Error message={t('team-not-found')} />;
-  if (error) return <Error message={t('error-loading-okrs')} />;
+  if (isError) return <Error message={t('error-loading-okrs')} />;
 
   const resetModal = () => {
     setTitle('');
@@ -50,6 +62,7 @@ const Okrs = () => {
     setEndDate('');
     setModalTouched({});
     setErrorMsg('');
+    setKeyResults([]);
   };
 
   const formatDate = (dateStr: string) => dateStr ? dateStr.slice(0, 10) : '';
@@ -61,6 +74,13 @@ const Okrs = () => {
     setStatus(objective.status);
     setStartDate(formatDate(objective.startDate));
     setEndDate(formatDate(objective.endDate));
+    setKeyResults(
+      objective.keyResults.map(kr => ({
+        title: kr.title,
+        targetValue: kr.targetValue,
+        unit: kr.unit,
+      }))
+    );
     setShowModal(true);
   };
 
@@ -69,32 +89,22 @@ const Okrs = () => {
     setCreating(true);
     setErrorMsg('');
     try {
-      const url = editingObjective
-        ? `/api/teams/${team.slug}/okrs/${editingObjective.id}`
-        : `/api/teams/${team.slug}/okrs`;
-      const method = editingObjective ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await createOrUpdateObjective(
+        {
           title,
           description,
           status,
           startDate,
           endDate,
-        }),
-      });
-      if (!res.ok) {
-        const json = await res.json();
-        setErrorMsg(json.error?.message || (editingObjective ? 'Failed to update objective' : 'Failed to create objective'));
-        return;
-      }
+          keyResults,
+        },
+        editingObjective?.id
+      );
       setShowModal(false);
       resetModal();
       setEditingObjective(null);
-      mutate(`/api/teams/${team.slug}/okrs`);
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setToastMsg(err.message);
     } finally {
       setCreating(false);
       setModalTouched({});
@@ -105,17 +115,9 @@ const Okrs = () => {
   const handleDelete = async (objectiveId: string) => {
     setDeletingId(objectiveId);
     try {
-      const res = await fetch(`/api/teams/${team.slug}/okrs/${objectiveId}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) {
-        const json = await res.json();
-        setErrorMsg(json.error?.message || 'Failed to delete objective');
-        return;
-      }
-      mutate(`/api/teams/${team.slug}/okrs`);
+      await deleteObjective(objectiveId);
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setToastMsg(err.message);
     } finally {
       setDeletingId(null);
       setDropdownOpenId(null);
@@ -129,8 +131,21 @@ const Okrs = () => {
     endDate: !endDate,
   };
 
+  // DEV: Test Toast button (only in development)
+  const isDev = process.env.NODE_ENV === 'development';
+
   return (
     <div className="p-6">
+      {/* DEV: Show Toast test button only in development */}
+      {isDev && (
+        <button
+          className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          onClick={() => setToastMsg('This is a test toast!')}
+        >
+          Show Test Toast
+        </button>
+      )}
+
       <h1 className="text-2xl font-bold mb-4">
         {team.name}: {t('Objectives & Key Results')}
       </h1>
@@ -165,12 +180,14 @@ const Okrs = () => {
         modal_touched={modal_touched}
         setModalTouched={setModalTouched}
         isEdit={!!editingObjective}
+        keyResults={keyResults}
+        setKeyResults={setKeyResults}
       />
 
-      {Array.isArray(data?.data) && data.data.length === 0 && (
+      {objectives.length === 0 && (
         <div className="text-gray-500">{t('No OKRs found for this team.')}</div>
       )}
-      {Array.isArray(data?.data) && data.data.map((objective) => (
+      {objectives.map((objective) => (
         <ObjectiveCard
           key={objective.id}
           objective={objective}
@@ -182,6 +199,27 @@ const Okrs = () => {
           onEdit={openEditModal}
         />
       ))}
+      {/* Pagination controls */}
+      {total > pageSize && (
+        <div className="flex justify-center mt-6 space-x-2">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+          >
+            {t('Previous')}
+          </button>
+          <span className="px-2 py-1">{t('Page')} {page}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+            onClick={() => setPage(page + 1)}
+            disabled={page * pageSize >= total}
+          >
+            {t('Next')}
+          </button>
+        </div>
+      )}
+      <Toast message={toastMsg} onClose={() => setToastMsg('')} />
     </div>
   );
 };

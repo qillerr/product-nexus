@@ -1,6 +1,7 @@
 import Modal from '@/components/shared/Modal';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import KeyResultsInput, { KeyResultDraft } from './KeyResultsInput';
 
 interface ObjectiveModalProps {
   open: boolean;
@@ -21,6 +22,8 @@ interface ObjectiveModalProps {
   modal_touched: { [key: string]: boolean };
   setModalTouched: (v: { [key: string]: boolean }) => void;
   isEdit?: boolean;
+  keyResults: KeyResultDraft[];
+  setKeyResults: (krs: KeyResultDraft[]) => void;
 }
 
 const ObjectiveModal: React.FC<ObjectiveModalProps> = ({
@@ -42,6 +45,8 @@ const ObjectiveModal: React.FC<ObjectiveModalProps> = ({
   modal_touched,
   setModalTouched,
   isEdit = false,
+  keyResults,
+  setKeyResults,
 }) => {
   const { t } = useTranslation('common');
   const modal_errors = {
@@ -137,6 +142,7 @@ const ObjectiveModal: React.FC<ObjectiveModalProps> = ({
               )}
             </div>
           </div>
+          <KeyResultsInput keyResults={keyResults} setKeyResults={setKeyResults} t={t} />
           {errorMsg && <div className="text-red-500">{errorMsg}</div>}
         </form>
       </Modal.Body>

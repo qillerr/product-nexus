@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
       case 'PUT': {
         throwIfNotAllowed(teamMember, 'okr', 'update');
-        const { title, description, status, startDate, endDate } = body;
+        const { title, description, status, startDate, endDate, keyResults } = body;
         if (!title || !startDate || !endDate) {
           return res.status(400).json({ error: { message: 'Missing required fields' } });
         }
@@ -27,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: status || ObjectiveStatus.ACTIVE,
             startDate: new Date(startDate),
             endDate: new Date(endDate),
+            keyResults: keyResults || [],
           }
         );
         res.status(200).json({ data: updated });
