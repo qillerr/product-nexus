@@ -42,6 +42,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json({ data: updated });
         break;
       }
+      case 'PATCH': {
+        throwIfNotAllowed(teamMember, 'okr', 'update');
+        // Accepts partial updates for title, description, status, dates
+        const allowedFields = ['title', 'description', 'status', 'startDate', 'endDate'];
+        const updateData: any = {};
+        for (const key of allowedFields) {
+          if (body[key] !== undefined) updateData[key] = body[key];
+        }
+        if (Object.keys(updateData).length === 0) {
+          return res.status(400).json({ error: { message: 'No valid fields to update' } });
+        }
+        // Convert dates if present
+        if (updateData.startDate) updateData.startDate = new Date(updateData.startDate);
+        if (updateData.endDate) updateData.endDate = new Date(updateData.endDate);
+        // Convert status to enum if present
+        if (updateData.status && typeof updateData.status === 'string') {
+          // Only allow valid enum values
+          const allowed = ["ACTIVE", "COMPLETED", "ARCHIVED"];
+          const upper = updateData.status.toUpperCase();
+          if (allowed.includes(upper)) {
+            updateData.status = upper as import('@prisma/client').ObjectiveStatus;
+          } else {
+            delete updateData.status;
+          }
+        }
+        // Remove undefined fields (especially keyResults)
+        Object.keys(updateData).forEach(key => {
+          if (updateData[key] === undefined) delete updateData[key];
+        });
+        const updated = await updateObjective(
+          objectiveId as string,
+          teamMember.team.id,
+          updateData
+        );
+        res.status(200).json({ data: updated });
+        break;
+      }
       case 'DELETE': {
         throwIfNotAllowed(teamMember, 'okr', 'delete');
         await deleteObjective(objectiveId as string, teamMember.team.id);
@@ -49,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break;
       }
       default:
-        res.setHeader('Allow', 'GET, PUT, DELETE');
+        res.setHeader('Allow', 'GET, PUT, PATCH, DELETE');
         res.status(405).json({ error: { message: `Method ${method} Not Allowed` } });
     }
   } catch (error: any) {
