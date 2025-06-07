@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { useState } from 'react';
 import { Objective } from '@/types/okr';
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useObjectiveDetails() {
   const router = useRouter();
@@ -41,11 +41,14 @@ export function useObjectiveDetails() {
 
   const patchKeyResult = async (krId: string, patch: any) => {
     try {
-      const res = await fetch(`/api/teams/${slug}/okrs/${objectiveId}/key-results/${krId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(patch),
-      });
+      const res = await fetch(
+        `/api/teams/${slug}/okrs/${objectiveId}/key-results/${krId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        }
+      );
       if (!res.ok) {
         const json = await res.json();
         throw Error(json.error?.message || 'Failed to update key result');
@@ -59,11 +62,14 @@ export function useObjectiveDetails() {
 
   const createKeyResult = async (kr: any) => {
     try {
-      const res = await fetch(`/api/teams/${slug}/okrs/${objectiveId}/key-results`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(kr),
-      });
+      const res = await fetch(
+        `/api/teams/${slug}/okrs/${objectiveId}/key-results`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(kr),
+        }
+      );
       if (!res.ok) {
         const json = await res.json();
         throw Error(json.error?.message || 'Failed to create key result');
@@ -77,9 +83,12 @@ export function useObjectiveDetails() {
 
   const deleteKeyResult = async (krId: string) => {
     try {
-      const res = await fetch(`/api/teams/${slug}/okrs/${objectiveId}/key-results/${krId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(
+        `/api/teams/${slug}/okrs/${objectiveId}/key-results/${krId}`,
+        {
+          method: 'DELETE',
+        }
+      );
       if (!res.ok) {
         const json = await res.json();
         throw Error(json.error?.message || 'Failed to delete key result');

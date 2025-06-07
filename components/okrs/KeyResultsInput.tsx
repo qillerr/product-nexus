@@ -23,7 +23,11 @@ export default function KeyResultsInput({
     if (!krTitle || !krTarget) return;
     setKeyResults([
       ...keyResults,
-      { title: krTitle, targetValue: Number(krTarget), unit: krUnit || undefined },
+      {
+        title: krTitle,
+        targetValue: Number(krTarget),
+        unit: krUnit || undefined,
+      },
     ]);
     setKrTitle('');
     setKrTarget('');
@@ -32,35 +36,37 @@ export default function KeyResultsInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-1">{t('Key Results')}</label>
+      <label className="block text-sm font-medium mb-1">
+        {t('key-results')}
+      </label>
       <div className="flex space-x-2 mb-2">
         <input
           type="text"
           className="flex-1 border rounded px-2 py-1"
-          placeholder={t('Key Result title')}
+          placeholder={t('key-result-title')}
           value={krTitle}
-          onChange={e => setKrTitle(e.target.value)}
+          onChange={(e) => setKrTitle(e.target.value)}
         />
         <input
           type="number"
           className="w-24 border rounded px-2 py-1"
-          placeholder={t('Target')}
+          placeholder={t('target')}
           value={krTarget}
-          onChange={e => setKrTarget(e.target.value)}
+          onChange={(e) => setKrTarget(e.target.value)}
         />
         <input
           type="text"
           className="w-16 border rounded px-2 py-1"
-          placeholder={t('Unit')}
+          placeholder={t('unit')}
           value={krUnit}
-          onChange={e => setKrUnit(e.target.value)}
+          onChange={(e) => setKrUnit(e.target.value)}
         />
         <button
           type="button"
           className="px-2 py-1 bg-green-500 text-white rounded"
           onClick={addKeyResult}
         >
-          {t('Add')}
+          {t('add')}
         </button>
       </div>
       <ul className="list-disc ml-6">
@@ -73,9 +79,11 @@ export default function KeyResultsInput({
             <button
               type="button"
               className="text-xs text-red-500"
-              onClick={() => setKeyResults(keyResults.filter((_, i) => i !== idx))}
+              onClick={() =>
+                setKeyResults(keyResults.filter((_, i) => i !== idx))
+              }
             >
-              {t('Remove')}
+              {t('remove')}
             </button>
           </li>
         ))}

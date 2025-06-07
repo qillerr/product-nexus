@@ -1,6 +1,3 @@
-
-
-
 export type KeyResult = {
   id: string;
   title: string;

@@ -25,17 +25,18 @@ export const createObjective = async (data: any) => {
   return prisma.objective.create({
     data: {
       ...objectiveData,
-      keyResults: keyResults && Array.isArray(keyResults)
-        ? {
-            create: keyResults.map(kr => ({
-              title: kr.title,
-              targetValue: kr.targetValue,
-              currentValue: kr.currentValue ?? 0,
-              unit: kr.unit,
-              status: kr.status ?? 'IN_PROGRESS',
-            })),
-          }
-        : undefined,
+      keyResults:
+        keyResults && Array.isArray(keyResults)
+          ? {
+              create: keyResults.map((kr) => ({
+                title: kr.title,
+                targetValue: kr.targetValue,
+                currentValue: kr.currentValue ?? 0,
+                unit: kr.unit,
+                status: kr.status ?? 'IN_PROGRESS',
+              })),
+            }
+          : undefined,
     },
     include: {
       keyResults: true,
@@ -73,7 +74,7 @@ export const updateObjective = async (
       ...objectiveData,
       keyResults: keyResults
         ? {
-            create: keyResults.map(kr => ({
+            create: keyResults.map((kr) => ({
               title: kr.title,
               targetValue: kr.targetValue,
               currentValue: kr.currentValue ?? 0,

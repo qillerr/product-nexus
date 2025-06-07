@@ -57,92 +57,123 @@ const ObjectiveModal: React.FC<ObjectiveModalProps> = ({
 
   return (
     <Modal open={open} close={onClose}>
-      <Modal.Header>{isEdit ? t('Edit Objective') : t('Create Objective')}</Modal.Header>
+      <Modal.Header>
+        {isEdit ? t('edit-objective') : t('create-objective')}
+      </Modal.Header>
       <Modal.Body>
         <form className="space-y-4" onSubmit={onSubmit} id="objective-form">
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="objective-title">
-              {t('Title')}
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="objective-title"
+            >
+              {t('title')}
             </label>
             <input
               id="objective-title"
               type="text"
               className="w-full border rounded px-3 py-2"
-              placeholder={t('Enter objective title')}
+              placeholder={t('enter-objective-title')}
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               onBlur={() => setModalTouched({ ...modal_touched, title: true })}
               required
             />
             {modal_touched.title && modal_errors.title && (
-              <div className="text-xs text-red-500 mt-1">* {t('Field required')}</div>
+              <div className="text-xs text-red-500 mt-1">
+                * {t('field-required')}
+              </div>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="objective-description">
-              {t('Description')}
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="objective-description"
+            >
+              {t('description')}
             </label>
             <textarea
               id="objective-description"
               className="w-full border rounded px-3 py-2"
-              placeholder={t('Enter objective description')}
+              placeholder={t('enter-objective-description')}
               rows={3}
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="objective-status">
-              {t('Status')}
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="objective-status"
+            >
+              {t('status')}
             </label>
             <select
               id="objective-status"
               className="w-full border rounded px-3 py-2"
               value={status}
-              onChange={e => setStatus(e.target.value)}
+              onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="ACTIVE">{t('Active')}</option>
-              <option value="COMPLETED">{t('Completed')}</option>
-              <option value="ARCHIVED">{t('Archived')}</option>
+              <option value="ACTIVE">{t('active')}</option>
+              <option value="COMPLETED">{t('completed')}</option>
+              <option value="ARCHIVED">{t('archived')}</option>
             </select>
           </div>
           <div className="flex space-x-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1" htmlFor="objective-start-date">
-                {t('Start Date')}
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="objective-start-date"
+              >
+                {t('start-date')}
               </label>
               <input
                 id="objective-start-date"
                 type="date"
                 className="w-full border rounded px-3 py-2"
                 value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                onBlur={() => setModalTouched({ ...modal_touched, startDate: true })}
+                onChange={(e) => setStartDate(e.target.value)}
+                onBlur={() =>
+                  setModalTouched({ ...modal_touched, startDate: true })
+                }
                 required
               />
               {modal_touched.startDate && modal_errors.startDate && (
-                <div className="text-xs text-red-500 mt-1">* {t('Field required')}</div>
+                <div className="text-xs text-red-500 mt-1">
+                  * {t('field-required')}
+                </div>
               )}
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1" htmlFor="objective-end-date">
-                {t('End Date')}
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="objective-end-date"
+              >
+                {t('end-date')}
               </label>
               <input
                 id="objective-end-date"
                 type="date"
                 className="w-full border rounded px-3 py-2"
                 value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-                onBlur={() => setModalTouched({ ...modal_touched, endDate: true })}
+                onChange={(e) => setEndDate(e.target.value)}
+                onBlur={() =>
+                  setModalTouched({ ...modal_touched, endDate: true })
+                }
                 required
               />
               {modal_touched.endDate && modal_errors.endDate && (
-                <div className="text-xs text-red-500 mt-1">* {t('Field required')}</div>
+                <div className="text-xs text-red-500 mt-1">
+                  * {t('field-required')}
+                </div>
               )}
             </div>
           </div>
-          <KeyResultsInput keyResults={keyResults} setKeyResults={setKeyResults} t={t} />
+          <KeyResultsInput
+            keyResults={keyResults}
+            setKeyResults={setKeyResults}
+            t={t}
+          />
           {errorMsg && <div className="text-red-500">{errorMsg}</div>}
         </form>
       </Modal.Body>
@@ -153,19 +184,27 @@ const ObjectiveModal: React.FC<ObjectiveModalProps> = ({
           type="button"
           disabled={creating}
         >
-          {t('Cancel')}
+          {t('cancel')}
         </button>
         <button
           className={`px-4 py-2 bg-blue-600 text-white rounded
-                ${creating || !title || !startDate || !endDate
-              ? 'bg-blue-300 cursor-not-allowed opacity-60'
-              : 'bg-blue-600 hover:bg-blue-700'}
+                ${
+                  creating || !title || !startDate || !endDate
+                    ? 'bg-blue-300 cursor-not-allowed opacity-60'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }
             `}
           type="submit"
           form="objective-form"
           disabled={creating || !title || !startDate || !endDate}
         >
-          {creating ? (isEdit ? t('Saving...') : t('Creating...')) : (isEdit ? t('Save') : t('Create'))}
+          {creating
+            ? isEdit
+              ? t('saving')
+              : t('creating')
+            : isEdit
+              ? t('save')
+              : t('create')}
         </button>
       </Modal.Footer>
     </Modal>

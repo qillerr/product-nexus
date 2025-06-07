@@ -7,13 +7,19 @@ export function useOkrs(teamSlug: string | undefined, pageSize = 10) {
   const key = teamSlug
     ? `/api/teams/${teamSlug}/okrs?page=${page}&limit=${pageSize}`
     : null;
-  const { data, error, isLoading } = useSWR<{ data: Objective[]; total: number }>(key, url => fetch(url).then(res => res.json()));
+  const { data, error, isLoading } = useSWR<{
+    data: Objective[];
+    total: number;
+  }>(key, (url) => fetch(url).then((res) => res.json()));
 
   const refresh = () => {
     if (key) mutate(key);
   };
 
-  const createOrUpdateObjective = async (payload: any, editingObjectiveId?: string) => {
+  const createOrUpdateObjective = async (
+    payload: any,
+    editingObjectiveId?: string
+  ) => {
     const url = editingObjectiveId
       ? `/api/teams/${teamSlug}/okrs/${editingObjectiveId}`
       : `/api/teams/${teamSlug}/okrs`;
@@ -25,7 +31,12 @@ export function useOkrs(teamSlug: string | undefined, pageSize = 10) {
     });
     if (!res.ok) {
       const json = await res.json();
-      throw new Error(json.error?.message || (editingObjectiveId ? 'Failed to update objective' : 'Failed to create objective'));
+      throw new Error(
+        json.error?.message ||
+          (editingObjectiveId
+            ? 'Failed to update objective'
+            : 'Failed to create objective')
+      );
     }
     refresh();
   };

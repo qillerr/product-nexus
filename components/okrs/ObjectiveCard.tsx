@@ -1,5 +1,5 @@
 import React from 'react';
-import { Objective, KeyResult, Initiative } from '@/types/okr';
+import { Objective } from '@/types/okr';
 
 interface ObjectiveCardProps {
   objective: Objective;
@@ -28,11 +28,13 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
       <button
         className="p-2 rounded hover:bg-gray-100"
         onClick={() =>
-          setDropdownOpenId(dropdownOpenId === objective.id ? null : objective.id)
+          setDropdownOpenId(
+            dropdownOpenId === objective.id ? null : objective.id
+          )
         }
         aria-label="More"
       >
-        <span style={{ fontSize: 20 }}>⋯</span>
+        <span style={{ fontSize: 20 }}>{t('three-dots')}</span>
       </button>
       {dropdownOpenId === objective.id && (
         <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-20">
@@ -41,21 +43,21 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
             onClick={() => onDetails && onDetails(objective)}
             disabled={!!deletingId}
           >
-            {t('Details')}
+            {t('details')}
           </button>
           <button
             className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-gray-100"
             onClick={() => onEdit && onEdit(objective)}
             disabled={!!deletingId}
           >
-            {t('Edit')}
+            {t('edit')}
           </button>
           <button
             className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
             onClick={() => handleDelete(objective.id)}
             disabled={deletingId === objective.id}
           >
-            {deletingId === objective.id ? t('Deleting...') : t('Delete')}
+            {deletingId === objective.id ? t('deleting') : t('delete')}
           </button>
         </div>
       )}
@@ -66,14 +68,16 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
         <h2 className="text-xl font-semibold">{objective.title}</h2>
         <p className="text-gray-600">{objective.description}</p>
         <div className="text-xs text-gray-400">
-          {objective.status} | {new Date(objective.startDate).toLocaleDateString()} - {new Date(objective.endDate).toLocaleDateString()}
+          {objective.status} |{' '}
+          {new Date(objective.startDate).toLocaleDateString()} -{' '}
+          {new Date(objective.endDate).toLocaleDateString()}
         </div>
       </div>
     </div>
     <div className="mt-4">
-      <h3 className="font-semibold">{t('Key Results')}</h3>
+      <h3 className="font-semibold">{t('key-results')}</h3>
       <ul className="list-disc ml-6">
-        {objective.keyResults.map(kr => (
+        {objective.keyResults.map((kr) => (
           <li key={kr.id} className="mb-1">
             <span className="font-medium">{kr.title}</span>
             {kr.unit && (
@@ -92,11 +96,12 @@ const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
       </ul>
     </div>
     <div className="mt-4">
-      <h3 className="font-semibold">{t('Initiatives')}</h3>
+      <h3 className="font-semibold">{t('initiatives')}</h3>
       <ul className="list-disc ml-6">
-        {objective.initiatives.map(init => (
+        {objective.initiatives.map((init) => (
           <li key={init.id}>
-            {init.title} <span className="ml-2 text-xs text-gray-400">{init.status}</span>
+            {init.title}{' '}
+            <span className="ml-2 text-xs text-gray-400">{init.status}</span>
           </li>
         ))}
       </ul>

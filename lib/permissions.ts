@@ -106,7 +106,7 @@ export const permissions: RolePermissions = {
       resource: 'team_audit_log',
       actions: '*',
     },
-      {
+    {
       resource: 'okr',
       actions: '*',
     },

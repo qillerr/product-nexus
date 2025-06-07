@@ -1,20 +1,20 @@
-import { Loading, Error } from '@/components/shared';
+import { Error } from '@/components/shared';
 import ObjectiveModal from '@/components/okrs/ObjectiveModal';
 import ObjectiveCard from '@/components/okrs/ObjectiveCard';
-import KeyResultsInput, { KeyResultDraft } from '@/components/okrs/KeyResultsInput';
+import { KeyResultDraft } from '@/components/okrs/KeyResultsInput';
 import useTeam from 'hooks/useTeam';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useEffect, useRef, useState } from 'react';
-import { Objective, KeyResult, Initiative } from '@/types/okr';
+import { useState } from 'react';
+import { Objective } from '@/types/okr';
 import { useOkrs } from '../../../hooks/useOkrs';
 import Toast from '@/components/shared/Toast';
 import { useRouter } from 'next/router';
 
 const Okrs = () => {
   const { t } = useTranslation('common');
-  const { team, isLoading: teamLoading, isError: teamError } = useTeam();
+  const { team, isError: teamError } = useTeam();
   const router = useRouter();
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -30,9 +30,13 @@ const Okrs = () => {
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   // Edit
-  const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
+  const [editingObjective, setEditingObjective] = useState<Objective | null>(
+    null
+  );
   // Auto-validation in modal
-  const [modal_touched, setModalTouched] = useState<{ [key: string]: boolean }>({});
+  const [modal_touched, setModalTouched] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   // Key Results state for modal
   const [keyResults, setKeyResults] = useState<KeyResultDraft[]>([]);
   const [toastMsg, setToastMsg] = useState('');
@@ -41,9 +45,7 @@ const Okrs = () => {
   const {
     objectives,
     total,
-    isLoading,
     isError,
-    error,
     page,
     setPage,
     pageSize,
@@ -51,7 +53,6 @@ const Okrs = () => {
     deleteObjective,
   } = useOkrs(team?.slug, 10);
 
-  if (teamLoading) return <Loading />;
   if (teamError) return <Error message={teamError.message} />;
   if (!team) return <Error message={t('team-not-found')} />;
   if (isError) return <Error message={t('error-loading-okrs')} />;
@@ -67,7 +68,7 @@ const Okrs = () => {
     setKeyResults([]);
   };
 
-  const formatDate = (dateStr: string) => dateStr ? dateStr.slice(0, 10) : '';
+  const formatDate = (dateStr: string) => (dateStr ? dateStr.slice(0, 10) : '');
 
   const openEditModal = (objective: Objective) => {
     setEditingObjective(objective);
@@ -77,7 +78,7 @@ const Okrs = () => {
     setStartDate(formatDate(objective.startDate));
     setEndDate(formatDate(objective.endDate));
     setKeyResults(
-      objective.keyResults.map(kr => ({
+      objective.keyResults.map((kr) => ({
         title: kr.title,
         targetValue: kr.targetValue,
         unit: kr.unit,
@@ -126,13 +127,6 @@ const Okrs = () => {
     }
   };
 
-  // Validation logic
-  const modal_errors = {
-    title: !title,
-    startDate: !startDate,
-    endDate: !endDate,
-  };
-
   // DEV: Test Toast button (only in development)
   const isDev = process.env.NODE_ENV === 'development';
 
@@ -144,19 +138,19 @@ const Okrs = () => {
           className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
           onClick={() => setToastMsg('This is a test toast!')}
         >
-          Show Test Toast
+          {t('show-test-toast')}
         </button>
       )}
 
       <h1 className="text-2xl font-bold mb-4">
-        {team.name}: {t('Objectives & Key Results')}
+        {team.name}: {t('objectives-key-results')}
       </h1>
 
       <button
         className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         onClick={() => setShowModal(true)}
       >
-        {t('Create Objective')}
+        {t('create-objective')}
       </button>
 
       <ObjectiveModal
@@ -187,7 +181,7 @@ const Okrs = () => {
       />
 
       {objectives.length === 0 && (
-        <div className="text-gray-500">{t('No OKRs found for this team.')}</div>
+        <div className="text-gray-500">{t('no-okrs-found')}</div>
       )}
       {objectives.map((objective) => (
         <ObjectiveCard
@@ -199,7 +193,9 @@ const Okrs = () => {
           handleDelete={handleDelete}
           t={t}
           onEdit={openEditModal}
-          onDetails={obj => router.push(`/teams/${team?.slug}/okrs/${obj.id}`)}
+          onDetails={(obj) =>
+            router.push(`/teams/${team?.slug}/okrs/${obj.id}`)
+          }
         />
       ))}
       {/* Pagination controls */}
@@ -210,15 +206,17 @@ const Okrs = () => {
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
-            {t('Previous')}
+            {t('previous')}
           </button>
-          <span className="px-2 py-1">{t('Page')} {page}</span>
+          <span className="px-2 py-1">
+            {t('page')} {page}
+          </span>
           <button
             className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
             onClick={() => setPage(page + 1)}
             disabled={page * pageSize >= total}
           >
-            {t('Next')}
+            {t('next')}
           </button>
         </div>
       )}
@@ -227,7 +225,9 @@ const Okrs = () => {
   );
 };
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({
+  locale,
+}: GetServerSidePropsContext) {
   return {
     props: {
       ...(locale ? await serverSideTranslations(locale, ['common']) : {}),

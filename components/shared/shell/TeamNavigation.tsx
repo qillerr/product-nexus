@@ -1,4 +1,8 @@
-import { Cog6ToothIcon, CodeBracketIcon, ChevronDoubleUpIcon } from '@heroicons/react/24/outline';
+import {
+  Cog6ToothIcon,
+  CodeBracketIcon,
+  ChevronDoubleUpIcon,
+} from '@heroicons/react/24/outline';
 import { useTranslation } from 'next-i18next';
 import NavigationItems from './NavigationItems';
 import { NavigationProps, MenuItem } from './NavigationItems';
@@ -17,7 +21,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       icon: CodeBracketIcon,
       active: activePathname === `/teams/${slug}/products`,
     },
-      {
+    {
       name: t('okrs'),
       href: `/teams/${slug}/okrs`,
       icon: ChevronDoubleUpIcon,
@@ -29,7 +33,9 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       icon: Cog6ToothIcon,
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        !(activePathname.includes('products') || activePathname.includes('okrs')),
+        !(
+          activePathname.includes('products') || activePathname.includes('okrs')
+        ),
     },
   ];
 

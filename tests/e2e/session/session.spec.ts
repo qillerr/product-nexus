@@ -28,6 +28,13 @@ const test = base.extend<SessionFixture>({
   },
 });
 
+const isDbSession = process.env.SESSION_STRATEGY === 'database';
+
+// Skip all tests in this file if not using DB-managed sessions
+if (!isDbSession) {
+  test.skip(true, 'Session tests require DB-managed sessions');
+}
+
 test.beforeEach(async ({ loginPage }) => {
   await loginPage.goto();
   await loginPage.credentialLogin(user.email, user.password);

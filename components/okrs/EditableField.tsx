@@ -21,7 +21,6 @@ interface EditableFieldProps {
 const EditableField: React.FC<EditableFieldProps> = ({
   value,
   onSave,
-  field,
   type = 'text',
   className = '',
   inputClassName = '',
@@ -79,7 +78,14 @@ const EditableField: React.FC<EditableFieldProps> = ({
 
   if (editing) {
     return (
-      <span className={className} style={{ display: 'inline-block', minWidth: 1, width: multiline ? '100%' : undefined }}>
+      <span
+        className={className}
+        style={{
+          display: 'inline-block',
+          minWidth: 1,
+          width: multiline ? '100%' : undefined,
+        }}
+      >
         {multiline ? (
           <textarea
             ref={inputRef as any}
@@ -97,7 +103,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
               boxShadow: '0 2px 8px 0 #0001',
               overflow: 'auto',
             }}
-            onChange={e => {
+            onChange={(e) => {
               setInputValue(e.target.value);
               if (onFieldChange) onFieldChange(e.target.value);
               const el = inputRef.current as HTMLTextAreaElement | null;
@@ -106,7 +112,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
                 el.style.height = el.scrollHeight + 'px';
               }
             }}
-            onBlur={e => {
+            onBlur={(e) => {
               handleSave();
               if (onFieldBlur) onFieldBlur(e.target.value);
             }}
@@ -121,12 +127,17 @@ const EditableField: React.FC<EditableFieldProps> = ({
             max={max}
             placeholder={placeholder}
             className={`bg-gray-100 border rounded px-1 py-0.5 ${inputClassName}`}
-            style={{ fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit', height: 'auto' }}
-            onChange={e => {
+            style={{
+              fontSize: 'inherit',
+              fontWeight: 'inherit',
+              lineHeight: 'inherit',
+              height: 'auto',
+            }}
+            onChange={(e) => {
               setInputValue(e.target.value);
               if (onFieldChange) onFieldChange(e.target.value);
             }}
-            onBlur={e => {
+            onBlur={(e) => {
               handleSave();
               if (onFieldBlur) onFieldBlur(e.target.value);
             }}
@@ -134,7 +145,9 @@ const EditableField: React.FC<EditableFieldProps> = ({
           />
         )}
         {error && <span className="ml-2 text-xs text-red-500">{error}</span>}
-        {externalError && <span className="ml-2 text-xs text-red-500">{externalError}</span>}
+        {externalError && (
+          <span className="ml-2 text-xs text-red-500">{externalError}</span>
+        )}
       </span>
     );
   }
@@ -143,10 +156,16 @@ const EditableField: React.FC<EditableFieldProps> = ({
       className={`${className} cursor-pointer transition bg-transparent hover:bg-gray-100 rounded px-1 block whitespace-pre-line`}
       tabIndex={0}
       onClick={() => setEditing(true)}
-      onKeyDown={e => { if (e.key === 'Enter') setEditing(true); }}
-      style={{ outline: editing ? '2px solid #60a5fa' : undefined, minHeight: multiline ? '3.5em' : undefined }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') setEditing(true);
+      }}
+      style={{
+        outline: editing ? '2px solid #60a5fa' : undefined,
+        minHeight: multiline ? '3.5em' : undefined,
+      }}
     >
-      {children || (value ? value : <span className="text-gray-400">{placeholder}</span>)}
+      {children ||
+        (value ? value : <span className="text-gray-400">{placeholder}</span>)}
     </span>
   );
 };

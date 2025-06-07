@@ -4,7 +4,10 @@ import { throwIfNoTeamAccess } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
 import { getObjectivesByTeam, createObjective } from 'models/objective';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const { method } = req;
 
   try {
@@ -45,9 +48,12 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
   throwIfNotAllowed(teamMember, 'okr', 'create');
-  const { title, description, status, startDate, endDate, keyResults } = req.body;
+  const { title, description, status, startDate, endDate, keyResults } =
+    req.body;
   if (!title || !startDate || !endDate) {
-    return res.status(400).json({ error: { message: 'Missing required fields' } });
+    return res
+      .status(400)
+      .json({ error: { message: 'Missing required fields' } });
   }
   const objective = await createObjective({
     teamId: teamMember.team.id,

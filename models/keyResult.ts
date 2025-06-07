@@ -21,7 +21,11 @@ export const createKeyResult = async (objectiveId: string, data: any) => {
   });
 };
 
-export const updateKeyResult = async (id: string, objectiveId: string, currentValue: number) => {
+export const updateKeyResult = async (
+  id: string,
+  objectiveId: string,
+  currentValue: number
+) => {
   return prisma.keyResult.update({
     where: { id, objectiveId },
     data: { currentValue },
@@ -31,7 +35,13 @@ export const updateKeyResult = async (id: string, objectiveId: string, currentVa
 export const patchKeyResult = async (
   id: string,
   objectiveId: string,
-  data: Partial<{ title: string; currentValue: number; targetValue: number; unit: string; status: KeyResultStatus }>
+  data: Partial<{
+    title: string;
+    currentValue: number;
+    targetValue: number;
+    unit: string;
+    status: KeyResultStatus;
+  }>
 ) => {
   // Convert status string to enum if present
   const patchData = { ...data };

@@ -7,7 +7,12 @@ interface StatusDropdownProps {
   className?: string;
 }
 
-const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, options, onSave, className = '' }) => {
+const StatusDropdown: React.FC<StatusDropdownProps> = ({
+  value,
+  options,
+  onSave,
+  className = '',
+}) => {
   const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState(value);
   const [error, setError] = useState('');
@@ -49,9 +54,15 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, options, onSave,
   const baseClass =
     'inline-block align-baseline text-xs font-medium px-2 py-0.5 rounded transition';
   const displayClass =
-    'bg-gray-100 hover:bg-gray-200 cursor-pointer ' + baseClass + ' ' + className;
+    'bg-gray-100 hover:bg-gray-200 cursor-pointer ' +
+    baseClass +
+    ' ' +
+    className;
   const selectClass =
-    'bg-gray-100 border rounded px-2 py-1 text-xs focus:ring-2 focus:ring-blue-400 ' + baseClass + ' ' + className;
+    'bg-gray-100 border rounded px-2 py-1 text-xs focus:ring-2 focus:ring-blue-400 ' +
+    baseClass +
+    ' ' +
+    className;
 
   if (editing) {
     return (
@@ -60,12 +71,14 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, options, onSave,
           ref={selectRef}
           value={selected}
           className={selectClass}
-          onChange={e => setSelected(e.target.value)}
+          onChange={(e) => setSelected(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
         >
           {options.map((opt: string) => (
-            <option key={opt} value={opt}>{opt}</option>
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
           ))}
         </select>
         {error && <span className="ml-2 text-xs text-red-500">{error}</span>}
@@ -77,7 +90,9 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, options, onSave,
       className={displayClass}
       tabIndex={0}
       onClick={() => setEditing(true)}
-      onKeyDown={e => { if (e.key === 'Enter') setEditing(true); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') setEditing(true);
+      }}
       style={{ outline: editing ? '2px solid #60a5fa' : undefined }}
     >
       {value}

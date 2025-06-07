@@ -23,7 +23,7 @@ const ObjectivePage = () => {
 
   if (isLoading) return <Loading />;
   if (error) return <Error message={t('error-loading-okrs')} />;
-  if (!objective) return <Error message={t('Objective not found')} />;
+  if (!objective) return <Error message={t('objective-not-found')} />;
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
@@ -31,7 +31,10 @@ const ObjectivePage = () => {
         className="mb-4 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700 flex items-center"
         onClick={goBack}
       >
-        <span className="mr-2" aria-hidden>←</span> {t('Back')}
+        <span className="mr-2" aria-hidden>
+          ←
+        </span>{' '}
+        {t('back')}
       </button>
       <ObjectiveDetails
         objective={objective}
@@ -45,7 +48,9 @@ const ObjectivePage = () => {
   );
 };
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({
+  locale,
+}: GetServerSidePropsContext) {
   return {
     props: {
       ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
